@@ -6,6 +6,7 @@
     "name": "amdl89"
   },
   "private": false,
+  "repository": "https://github.com/amdl89/v-for",
   "type": "module",
   "exports": {
     ".": "./dist/index.js"
