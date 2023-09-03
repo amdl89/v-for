@@ -1,6 +1,6 @@
 {
   "name": "v-for",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "for-loop component for vue inspired by laravel blade's for-loop",
   "author": {
     "name": "amdl89"
