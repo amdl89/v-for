@@ -1,0 +1,34 @@
+{
+  "name": "v-for",
+  "version": "0.0.0",
+  "description": "for-loop component for vue inspired by laravel blade's for-loop",
+  "author": {
+    "name": "amdl89"
+  },
+  "private": false,
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "vue",
+    "for",
+    "blade"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.1",
+    "vite": "^4.4.9"
+  }
+}
