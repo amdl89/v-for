@@ -2,157 +2,160 @@
 import Break from "@/components/Break.vue";
 import Continue from "@/components/Continue.vue";
 
-const BREAK_MARKER = 'BREAK';
-const CONTINUE_MARKER = 'CONTINUE';
+const BREAK_MARKER = "BREAK";
+const CONTINUE_MARKER = "CONTINUE";
 
 function recursiveVisitor(stackFrame) {
-  const stack = [];
-  let result = null;
+    const stack = [];
+    let result = null;
 
-  stack.push(stackFrame);
+    stack.push(stackFrame);
 
-  while(stack.length) {
-    const{value: currentFrame, done} = stack[stack.length - 1].next(result);
-    if(done) {
-      stack.pop();
-      result = currentFrame;
+    while (stack.length) {
+        const { value: currentFrame, done } =
+            stack[stack.length - 1].next(result);
+        if (done) {
+            stack.pop();
+            result = currentFrame;
+        } else {
+            stack.push(currentFrame);
+            result = null;
+        }
     }
-    else {
-      stack.push(currentFrame);
-      result = null;
-    }
-  }
 
-  return result;
+    return result;
 }
 function* truncateNodesIfMarkerFound(vnodes) {
-  const newChildren = [];
-  let markerFound = null;
-  for (let i = 0; i < vnodes.length; i++) {
-    const vnode = vnodes[i];
+    const newChildren = [];
+    let markerFound = null;
+    for (let i = 0; i < vnodes.length; i++) {
+        const vnode = vnodes[i];
 
-    if (vnode) {
-      if (vnode.type === Break) {
-        markerFound = BREAK_MARKER;
-      }
-      if (vnode.type === Continue) {
-        markerFound = CONTINUE_MARKER;
-      }
+        if (vnode) {
+            if (vnode.type === Break) {
+                markerFound = BREAK_MARKER;
+            }
+            if (vnode.type === Continue) {
+                markerFound = CONTINUE_MARKER;
+            }
 
-      if (markerFound) {
-        break;
-      }
+            if (markerFound) {
+                break;
+            }
 
-      newChildren.push(vnode);
+            newChildren.push(vnode);
 
-      if (vnode.type === ForComponent) {
-        continue;
-      }
+            if (vnode.type === ForComponent) {
+                continue;
+            }
 
-      if (Array.isArray(vnode.children)) {
-        const {
-          newChildren: newGrandChildren,
-          markerFound: childrenMarkerFound
-        } = yield truncateNodesIfMarkerFound(vnode.children);
+            if (Array.isArray(vnode.children)) {
+                const {
+                    newChildren: newGrandChildren,
+                    markerFound: childrenMarkerFound,
+                } = yield truncateNodesIfMarkerFound(vnode.children);
 
-        markerFound = childrenMarkerFound;
+                markerFound = childrenMarkerFound;
 
-        if (markerFound) {
-          vnode.children = newGrandChildren;
-          break;
+                if (markerFound) {
+                    vnode.children = newGrandChildren;
+                    break;
+                }
+            }
         }
-      }
     }
-  }
 
-  return {
-    newChildren,
-    markerFound
-  }
+    return {
+        newChildren,
+        markerFound,
+    };
 }
 
 const ForComponent = {
-  props: {
-    of: {
-      type: Array,
-      required: true,
+    props: {
+        of: {
+            type: Array,
+            required: true,
+        },
     },
-  },
 
-  provide() {
-    return {
-      __depth: this.loopDepth,
-    }
-  },
-
-  inject: {
-    depth: {
-      from: '__depth',
-      default: 0,
+    provide() {
+        return {
+            __depth: this.loopDepth,
+        };
     },
-  },
 
-  render() {
-    if (this.$slots.empty) {
-      return this.$slots.empty();
-    }
+    inject: {
+        depth: {
+            from: "__depth",
+            default: 0,
+        },
+    },
 
-    const items = this.of;
-    const renderedChildren = [];
-    for (let i = 0; i < items.length; i++) {
-      const children = this.$slots.default({
-        item: items[i],
-        $loop: this.loop(i),
-      })
+    render() {
+        const items = this.of;
+        const renderedChildren = [];
 
-      if (Array.isArray(children)) {
-        const {
-          newChildren,
-          markerFound
-        } = recursiveVisitor(truncateNodesIfMarkerFound(children));
+        let i = 0;
+        for (const item of items) {
+            const children = this.$slots.default({
+                item,
+                $loop: this.loop(i),
+            });
 
-        renderedChildren.push(newChildren);
+            if (Array.isArray(children)) {
+                const { newChildren, markerFound } = recursiveVisitor(
+                    truncateNodesIfMarkerFound(children)
+                );
 
-        if (markerFound === BREAK_MARKER) {
-          break;
+                renderedChildren.push(newChildren);
+
+                if (markerFound === BREAK_MARKER) {
+                    break;
+                }
+            } else {
+                renderedChildren.push(children);
+            }
+
+            i++;
         }
-      } else {
-        renderedChildren.push(children);
-      }
-    }
 
-    return renderedChildren;
-  },
-  methods: {
-    loop(index) {
-      const count = this.of.length
-      const iteration = index + 1
-      const remaining = count - iteration
-      const first = iteration === 1
-      const last = iteration === count
-      const even = iteration % 2 === 0
-      const odd = !even
-      const depth = this.loopDepth
+        if (!renderedChildren.length && this.$slots.empty) {
+            return this.$slots.empty();
+        }
 
-      return {
-        index,
-        iteration,
-        remaining,
-        count,
-        first,
-        last,
-        even,
-        odd,
-        depth,
-      }
+        return renderedChildren;
     },
-  },
-  computed: {
-    loopDepth() {
-      return this.depth + 1
+    methods: {
+        loop(index) {
+            const count = this.of.length;
+            const iteration = index + 1;
+            const remaining = count - iteration;
+            const first = iteration === 1;
+            const last = iteration === count;
+            const even = iteration % 2 === 0;
+            const odd = !even;
+            const depth = this.loopDepth;
+
+            return {
+                index,
+                iteration,
+                remaining,
+                count,
+                first,
+                last,
+                even,
+                odd,
+                depth,
+            };
+        },
     },
-  },
-}
+    computed: {
+        loopDepth() {
+            return this.depth + 1;
+        },
+    },
+};
 
 export default ForComponent;
 </script>
