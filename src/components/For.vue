@@ -74,8 +74,13 @@ function* truncateNodesIfMarkerFound(vnodes) {
 const ForComponent = {
     props: {
         of: {
-            type: Array,
             required: true,
+            validator(value) {
+                if (value === null || value === undefined) {
+                    return false;
+                }
+                return typeof value[Symbol.iterator] === "function";
+            },
         },
     },
 
