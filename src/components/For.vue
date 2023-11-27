@@ -75,12 +75,7 @@ const ForComponent = {
     props: {
         of: {
             required: true,
-            validator(value) {
-                if (value === null || value === undefined) {
-                    return false;
-                }
-                return typeof value[Symbol.iterator] === "function";
-            },
+            type: Array,
         },
     },
 
