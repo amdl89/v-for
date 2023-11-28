@@ -8,7 +8,7 @@ export default defineConfig({
     build: {
         lib: {
             entry: resolve(__dirname, "src/index.js"),
-            name: "VFor",
+            name: "vFor",
             fileName: (format) => (format === "es" ? "index.js" : "index.c.js"),
         },
         rollupOptions: {
