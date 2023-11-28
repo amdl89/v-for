@@ -4,13 +4,11 @@ Vue 3 for loop component similar to laravel blade's `foreach` directive.
 
 ---
 
-<!-- ## Install
-
-The library is available on [npm](https://www.npmjs.com/) as [`vFor`](https://www.npmjs.com/package/v-for).
+## Install
 
 ```bash
 npm install --save v-for
-``` -->
+```
 
 ## Setup
 
