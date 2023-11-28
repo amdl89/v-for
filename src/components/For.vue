@@ -1,6 +1,6 @@
 <script>
-import Break from "@/components/Break.vue";
-import Continue from "@/components/Continue.vue";
+import Break from "./Break.vue";
+import Continue from "./Continue.vue";
 
 const BREAK_MARKER = "BREAK";
 const CONTINUE_MARKER = "CONTINUE";
